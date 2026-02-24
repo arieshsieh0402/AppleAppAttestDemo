@@ -11,7 +11,7 @@ import CryptoKit
 
 class ViewController: UIViewController {
     
-    private let serverURL = "YOUR_SERVER_URL"
+    private let serverURL = "http://192.168.171.98:3000"
     private let keyIdStorageKey = "AppAttestKeyId"
     
     // 😈 用來儲存被攔截的合法請求
@@ -149,6 +149,7 @@ class ViewController: UIViewController {
             
             let payloadHash = SHA256.hash(data: payloadData)
             let payloadHashHex = payloadHash.compactMap { String(format: "%02x", $0) }.joined()
+            let payloadBase64 = payloadData.base64EncodedString()
             
             // 3. 建立 Client Data 並計算 Hash
             let clientDataObj = ClientData(challenge: challengeHex, payload_hash: payloadHashHex)
@@ -170,7 +171,7 @@ class ViewController: UIViewController {
             // 5. 組合最終請求傳送至後端
             let requestBody: [String: Any] = [
                 "key_id": keyId,
-                "payload": try JSONSerialization.jsonObject(with: payloadData) as! [String: Any],
+                "payload": payloadBase64,
                 "assertion_object_b64": assertionBase64,
                 "client_data_raw": exactClientDataString
             ]
